@@ -10,12 +10,35 @@ export const postRequest = async (url, body) => {
         },
         body: JSON.stringify(body)
     });
-    const data = await response.json();
 
-    if (!response.ok) {
+    console.log(response);
+
+    let data;
+    if (response.ok) {
+        data = response.status === 204 ? null : await response.json();
+    } else {
+        data = await response.json();
         throw new Error(data.error.message);
     }
+
     return data;
 }
 
-
+export const getRequest = async (url, body) =>{
+    const response = await fetch(url, {
+        method:'GET',
+        headers:{
+            'content-typr':'application/json',
+        },
+        body: JSON.stringify(body)
+    });
+    console.log(response);
+    let data;
+    if(response.ok){
+        data = response.status === 204 ? null : await response.json();        
+    }else{
+        data = await response.json();
+        throw new Error(data.error.message);
+    }
+    return
+}
