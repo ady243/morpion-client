@@ -10,7 +10,6 @@ export const routes = [
     {
         path: "/login",
         component: LoginPage,
-   
     },
 
     {
@@ -22,19 +21,19 @@ export const routes = [
     {
         path: "/",
         component: HomePage,
+        protected: true,
    
     },
 
     {
         path: "/profile",
         component: ProfilePage,
+        protected: true,
    
     },
     {
         path: "/email-wait",
         component: EmailWaitPage,
-
-   
     },
 
 ];

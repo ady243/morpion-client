@@ -2,11 +2,13 @@
 import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button} from "@nextui-org/react";
 import {Badge} from "@nextui-org/react";
 import {NotificationIcon} from "./NotificationIcon.jsx";
-import {useState} from "react";
+import {useContext, useState} from "react";
+import { AuthContext } from "../context/AuthContext.jsx";
 
 
 export default function NavBar() {
     const [isInvisible] = useState(false);
+    const {logout} = useContext(AuthContext);
 
 
     const StyleNotification = {
@@ -35,13 +37,12 @@ export default function NavBar() {
                 </NavbarItem>
             </NavbarContent>
             <NavbarContent justify="end">
-                <NavbarItem className="hidden lg:flex">
-                    <Link href="/login">Se connecter</Link>
-                </NavbarItem>
                 <NavbarItem>
-                    <Button as={Link} color="primary" href="#" variant="flat">
-                       Se déconnecter
-                    </Button>
+                </NavbarItem>
+            </NavbarContent>
+            <NavbarContent justify="end">
+                <NavbarItem>
+                    <Button auto onClick={logout}>Déconnexion</Button>
                 </NavbarItem>
             </NavbarContent>
         </Navbar>

@@ -1,28 +1,43 @@
-import {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
-import {AuthContext} from "../context/AuthContext.jsx";
+import { AuthContext } from "../context/AuthContext.jsx";
 
-
-const socket = io('http://localhost:4000');
-
-function Game() {
+const Game = () => {
     const [history, setHistory] = useState([Array(9).fill(null)]);
     const [currentMove, setCurrentMove] = useState(0);
-    const { token } = useContext(AuthContext);
+    const { token, currentUser } = useContext(AuthContext);
+    const [socket, setSocket] = useState(null);
+    const [currentPlayer, setCurrentPlayer] = useState('X');
 
     useEffect(() => {
-        socket.on('move', (moveData) => {
-            setHistory(moveData.history);
-            setCurrentMove(moveData.currentMove);
-        });
-        return () => socket.disconnect();
+        const newSocket = io('http://localhost:4000');
+        setSocket(newSocket);
+
+        return () => newSocket.close();
     }, []);
 
     useEffect(() => {
-        socket.on('connect', () => {
-            socket.emit('authenticate', { token });
+        if (!socket) return;
+
+        socket.on('move', (moveData) => {
+            setHistory(moveData.history);
+            console.log('move', moveData);
+            setCurrentMove(moveData.currentMove);
+            console.log('move', moveData);
         });
-    }, [token]);
+
+        return () => socket.off('move');
+    }, [socket]);
+
+    useEffect(() => {
+        if (!socket || !token) return;
+
+        socket.emit('authenticate', { token });
+        console.log('emitted', token);
+
+        return () => socket.off('connect');
+    }, [socket, token]);
+
 
     const calculateWinner = (squares) => {
         const lines = [
@@ -49,12 +64,15 @@ function Game() {
             return;
         }
         const nextSquares = history[currentMove].slice();
-        nextSquares[i] = currentMove % 2 === 0 ? 'X' : 'O';
+        nextSquares[i] = currentPlayer; // Utilisation du joueur actuel
         const nextHistory = history.slice(0, currentMove + 1).concat([nextSquares]);
         setHistory(nextHistory);
         setCurrentMove(nextHistory.length - 1);
+        setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X'); 
+        if (socket) {
+            socket.emit('move', { history: nextHistory, currentMove: nextHistory.length - 1 });
+        }
     };
-
 
 
     const currentSquares = history[currentMove];
@@ -62,14 +80,12 @@ function Game() {
     const winner = calculateWinner(currentSquares);
     let status;
     if (winner) {
-        status = winner + ' a gagné';
+        status = currentUser ? currentUser.fullName : winner + ' a gagné';
     } else {
-        status = 'Prochain tour : ' + (xIsNext ? 'ady' : 'user');
+        status = 'Au tour de  ' + (xIsNext ? (currentUser ? currentUser.fullName : 'X') : 'O');
     }
 
-
-
-    const styles = {
+    const buttonStyle = {
         width: '200px',
         height: '150px',
         margin: '5px',
@@ -93,15 +109,13 @@ function Game() {
     const Square = ({ value, onClick }) => (
         <div>
             <button
-                style={styles}
+                style={buttonStyle}
                 onClick={onClick}
             >
-                {value}
+                <span style={{color: value === 'X' ? 'red' : 'blue'}}>{value}</span>
             </button>
         </div>
-
     );
-
     const Board = () => (
         <>
             <div className="mb-4 text-2xl font-bold">{status}</div>
@@ -130,6 +144,6 @@ function Game() {
             </div>
         </div>
     );
-}
+};
 
 export default Game;

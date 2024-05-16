@@ -1,6 +1,6 @@
 
-export const apiAuhentication = "http://localhost:4000/api/";
 
+export const apiAuhentication = "http://localhost:4000/api";
 
 export const postRequest = async (url, body) => {
     const response = await fetch(url, {
@@ -11,7 +11,6 @@ export const postRequest = async (url, body) => {
         body: JSON.stringify(body)
     });
 
-
     let data;
     if (response.ok) {
         data = response.status === 204 ? null : await response.json();
@@ -21,6 +20,4 @@ export const postRequest = async (url, body) => {
     }
 
     return data;
-}
-
-
+};
