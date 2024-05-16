@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import {AuthContext} from "../context/AuthContext.jsx";
 
 
-const socket = io('https://morpion-soket-back.vercel.app');
+const socket = io('http://localhost:4000');
 
 function Game() {
     const [history, setHistory] = useState([Array(9).fill(null)]);
