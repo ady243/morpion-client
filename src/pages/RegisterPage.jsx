@@ -1,7 +1,9 @@
 import {useState, useContext} from 'react';
 import FormBuilder from '../component/FormBuilder';
 import { AuthContext } from '../context/AuthContext';
-import ConfirmLoad from "../component/loader/ConfirmLoad"
+import { useNavigate } from 'react-router-dom';
+
+
 
 const RegisterPage = () => {
 
@@ -9,9 +11,8 @@ const RegisterPage = () => {
     const [fullName, setFullName] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const { register, updateRegister } = useContext(AuthContext); 
-    // const navigate = useNavigate();
+    const { register, updateRegister } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const inputStyle = { 
         width: '100%',
@@ -41,7 +42,8 @@ const RegisterPage = () => {
         {
             type: 'text',
             name: 'fullName',
-            placeholder: 'Full Name',
+            label: 'Noms*',
+            placeholder: 'Noms',
             required: true,
             value: fullName, 
             onChange: (e) => {
@@ -53,6 +55,7 @@ const RegisterPage = () => {
         {
             type: 'email',
             name: 'email',
+            label: 'Email* ',
             placeholder: 'Email',
             required: true,
             value: email, 
@@ -65,7 +68,8 @@ const RegisterPage = () => {
         {
             type: 'password',
             name: 'password',
-            placeholder: 'Password',
+            label: '*',
+            placeholder: 'Mot de passe',
             required: true,
             value: password, 
             onChange: (e) => {
@@ -78,13 +82,11 @@ const RegisterPage = () => {
             type: 'button', 
             label: 'Create Account', 
             onClick: async () => {
-                setIsLoading(true);
                 try {
                     await register();
-                    setIsLoading(false);
+                   navigate('/email-wait');
                 } catch (error) {
                     setError(error);
-                    setIsLoading(false);
                 }
             },
             style: buttonRegister
@@ -98,10 +100,9 @@ const RegisterPage = () => {
             {error && error.error && <p className="text-red-500 text-sm">{error.error.message}</p>}
             <div className="bg-white rounded px-8 pt-6 pb-8 mb-4 max-w-lg mx-auto">
                 <FormBuilder fields={fields} />
-                {isLoading && <ConfirmLoad/>}
-                {/* <p className="text-sm text-gray-600 mt-4">
+                 <p className="text-sm text-gray-600 mt-4">
                     Already have account? <a href="/login" className="text-indigo-600 hover:text-indigo-700">Login</a>
-                </p> */}
+                </p>
                 
             </div>
         </div>

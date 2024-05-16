@@ -1,12 +1,14 @@
-import  {useState} from 'react';
-import FormBuilder from '../components/FormBuilder';
+import {useContext, useState} from 'react';
+import FormBuilder from "../component/FormBuilder.jsx";
 import { useNavigate } from 'react-router-dom';
+import {AuthContext} from "../context/AuthContext.jsx";
 
 const LoginPage = () => {
 
-    // const [email, setEmail] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-        const [error, setError] = useState(null);
+    const [error, setError] = useState(null);
+    const { login, updateLogin, loginUser } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
@@ -38,30 +40,38 @@ const LoginPage = () => {
         {
             type: 'email',
             name: 'email',
+            label: 'Email*      ',
             placeholder: 'Email',
             required: true,
-            // value: email, 
-            // onChange: (e) => setEmail(e.target.value),
+            value: email,
+            onChange: (e) => {
+                setEmail(e.target.value);
+                updateLogin('email', e.target.value);
+            },
             style: inputStyle
         },
         {
             type: 'password',
             name: 'password',
+            label: 'Password*',
             placeholder: 'Password',
             required: true,
-            value: password, 
-            onChange: (e) => setPassword(e.target.value), 
+            value: password,
+            onChange: (e) => {
+                setPassword(e.target.value);
+                updateLogin('password', e.target.value);
+            },
             style: inputStyle
         },
         {
-            type: 'button', 
-            label: 'Login', 
+            type: 'button',
+            label: 'Login',
             onClick: async () => {
-                try {
-                    // await login(email, password);
+                const result = await login();
+                if (result && result.success) {
                     navigate('/');
-                } catch (error) {
-                    setError(error);
+                } else {
+                    setError(result && result.error ? result.error : "Une erreur s'est produite.");
                 }
             },
             style: buttonLogin
@@ -70,7 +80,6 @@ const LoginPage = () => {
 
     return (
         <div className='text-center mt-28'>
-            <img src="https://zupimages.net/up/24/15/just.png" alt="logo" className="mx-auto" style={{width: '200px'}} />
             <h1 style={{fontSize: '2rem', color: '#444'}}>Connexion</h1>
             {error && error.error && <p className="text-red-500 text-sm">{error.error.message}</p>}
             <div className="bg-white rounded px-8 pt-6 pb-8 mb-4 max-w-lg mx-auto">

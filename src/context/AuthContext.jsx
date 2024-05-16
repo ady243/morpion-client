@@ -73,24 +73,32 @@ export const AuthContextProvider = ({children}) => {
             [key]: value
         })
     }
-    
+
     const loginUser = useCallback(async () => {
         try{
             const response = await postRequest(
                 `${apiAuhentication}/users/login`,
                 login
             )
-    
+
             if(!response.ok){
                 throw response;
             }
-    
+
             const data = await response.json();
             console.log(data.user);
             setUser(data.user);
-            setToken(data.token)
+            setToken(data.token);
+
+            console.log('Token:', data.token);
+
+            // Return the result
+            return { success: true, user: data.user, token: data.token };
         }catch(error){
             console.error(error)
+
+            // Return the error
+            return { success: false, error };
         }
     }, [login])
 

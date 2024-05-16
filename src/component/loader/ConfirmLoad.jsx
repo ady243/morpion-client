@@ -5,7 +5,7 @@ function ConfirmLoad() {
   return (
   <>
     <div>
-      <div className="loader"></div>
+      <div className="loader animate-bounce"></div>
     </div>
   </>
 
