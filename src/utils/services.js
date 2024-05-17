@@ -1,6 +1,6 @@
 
 
-export const apiAuhentication = "http://localhost:4000/api";
+export const apiAuhentication = "https://morpion-soket-back.vercel.app";
 
 export const postRequest = async (url, body) => {
     const response = await fetch(url, {
