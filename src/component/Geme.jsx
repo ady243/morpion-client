@@ -1,43 +1,42 @@
 import React, { useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from "../context/AuthContext.jsx";
+import "./game.css";
 
 const Game = () => {
     const [history, setHistory] = useState([Array(9).fill(null)]);
     const [currentMove, setCurrentMove] = useState(0);
-    const { token, currentUser } = useContext(AuthContext);
+    const { token } = useContext(AuthContext);
     const [socket, setSocket] = useState(null);
     const [currentPlayer, setCurrentPlayer] = useState('X');
+    const [players, setPlayers] = useState({ X: null, O: null });
+    const [role, setRole] = useState(null);
 
     useEffect(() => {
-        const newSocket = io('https://morpion-soket-back.vercel.app');
+        // const newSocket = io('http://localhost:4000', { query: { token } });
+        const newSocket = io('https://morpion-soket-back.vercel.app', { query: { token } });
         setSocket(newSocket);
 
-        return () => newSocket.close();
-    }, []);
-
-    useEffect(() => {
-        if (!socket) return;
-
-        socket.on('move', (moveData) => {
-            setHistory(moveData.history);
-            console.log('move', moveData);
-            setCurrentMove(moveData.currentMove);
-            console.log('move', moveData);
+        newSocket.on('connect', () => {
+            console.log('Connected:', newSocket.id);
         });
 
-        return () => socket.off('move');
-    }, [socket]);
+        newSocket.on('role', (assignedRole) => {
+            setRole(assignedRole);
+        });
 
-    useEffect(() => {
-        if (!socket || !token) return;
+        newSocket.on('players', (playersData) => {
+            setPlayers(playersData);
+        });
 
-        socket.emit('authenticate', { token });
-        console.log('emitted', token);
+        newSocket.on('move', (moveData) => {
+            setHistory(moveData.history);
+            setCurrentMove(moveData.currentMove);
+            setCurrentPlayer(moveData.currentPlayer);
+        });
 
-        return () => socket.off('connect');
-    }, [socket, token]);
-
+        return () => newSocket.close();
+    }, [token]);
 
     const calculateWinner = (squares) => {
         const lines = [
@@ -60,67 +59,57 @@ const Game = () => {
     };
 
     const handlePlay = (i) => {
-        if (calculateWinner(history[currentMove]) || history[currentMove][i]) {
-            return;
-        }
-        const nextSquares = history[currentMove].slice();
-        nextSquares[i] = currentPlayer; // Utilisation du joueur actuel
+        const currentSquares = history[currentMove];
+        if (calculateWinner(currentSquares) || currentSquares[i]) return;
+
+        if ((currentPlayer === 'X' && role !== 'X') || (currentPlayer === 'O' && role !== 'O')) return;
+
+        const nextSquares = currentSquares.slice();
+        nextSquares[i] = currentPlayer;
         const nextHistory = history.slice(0, currentMove + 1).concat([nextSquares]);
+
         setHistory(nextHistory);
         setCurrentMove(nextHistory.length - 1);
-        setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X'); 
+        const nextPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        setCurrentPlayer(nextPlayer);
+
         if (socket) {
-            socket.emit('move', { history: nextHistory, currentMove: nextHistory.length - 1 });
+            socket.emit('move', {
+                history: nextHistory,
+                currentMove: nextHistory.length - 1,
+                currentPlayer: nextPlayer
+            });
         }
     };
 
-
     const currentSquares = history[currentMove];
-    const xIsNext = currentMove % 2 === 0;
     const winner = calculateWinner(currentSquares);
+    const xIsNext = currentMove % 2 === 0;
+
     let status;
     if (winner) {
-        status = currentUser ? currentUser.fullName : winner + ' a gagné';
-    } else {
-        status = 'Au tour de  ' + (xIsNext ? (currentUser ? currentUser.fullName : 'X') : 'O');
-    }
-
-    const buttonStyle = {
-        width: '200px',
-        height: '150px',
-        margin: '5px',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        border: '2px solid #333',
-        borderRadius: '5px',
-        backgroundColor: '#fff',
-        color: '#333',
-        fontSize: '2em',
-        fontWeight: 'bold',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        ':hover': {
-            backgroundColor: '#f4f4f4',
-            transform: 'scale(1.1)',
+        if (players[winner]?.id === socket.id) {
+            status = `Félicitations ${players[winner].name}, vous avez gagné!`;
+        } else {
+            status = `Désolé, vous avez perdu. ${players[winner].name} a gagné.`;
         }
+        socket.emit('win', { winner: players[winner]?.id });
+    } else {
+        const nextPlayerName = xIsNext ? (role === 'X' ? (players.X?.name || 'Votre adversaire') : (players.O?.name || 'Votre adversaire')) : (role === 'O' ? (players.O?.name || 'Votre adversaire') : (players.X?.name || 'Votre adversaire'));
+        status = `Au tour de ${nextPlayerName}`;
     }
 
     const Square = ({ value, onClick }) => (
-        <div>
-            <button
-                style={buttonStyle}
-                onClick={onClick}
-            >
-                <span style={{color: value === 'X' ? 'red' : 'blue'}}>{value}</span>
-            </button>
-        </div>
+        <button className="button" onClick={onClick}>
+            <span className={`${value === 'X' ? 'text-red-500' : 'text-blue-500'}`}>{value}</span>
+        </button>
     );
+
     const Board = () => (
         <>
-            <div className="mb-4 text-2xl font-bold">{status}</div>
+            <div className="mb-4 font-bold">{status}</div>
             {[0, 1, 2].map((row) => (
-                <div className="flex" key={row}>
+                <div className="flex" key={row} style={{ justifyContent: 'center' }}>
                     {[0, 1, 2].map((col) => (
                         <Square
                             key={col}
@@ -134,12 +123,10 @@ const Game = () => {
     );
 
     return (
-        <div className="flex justify-center items-center h-screen">
-            <div className="w-2/3">
-                <div className=" p-6 ">
-                    <div className="mb-8">
-                        <Board />
-                    </div>
+        <div className="container">
+            <div className="w-full max-w-md p-4 mx-auto">
+                <div className="bg-white p-4 rounded-lg shadow-lg">
+                    <Board />
                 </div>
             </div>
         </div>
