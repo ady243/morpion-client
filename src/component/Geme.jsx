@@ -13,8 +13,8 @@ const Game = () => {
     const [role, setRole] = useState(null);
 
     useEffect(() => {
-        // const newSocket = io('http://localhost:4000', { query: { token } });
-        const newSocket = io('https://morpion-soket-back.vercel.app', { query: { token } });
+        const newSocket = io('http://localhost:4000', { query: { token } });
+        // const newSocket = io('https://morpion-soket-back.vercel.app', { query: { token } });
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
