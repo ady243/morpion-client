@@ -84,7 +84,6 @@ export const AuthContextProvider = ({ children }) => {
                 body: JSON.stringify({ email, password })
             });
             const data = await response.json();
-            console.log(data);
             if (!response.ok) {
                 throw data;
             }
@@ -106,7 +105,7 @@ export const AuthContextProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={{
-            user,
+            user: currentUser,
             currentUser,
             token,
             logout,
