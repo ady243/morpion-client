@@ -14,7 +14,7 @@ const Game = () => {
 
     useEffect(() => {
         const newSocket = io('http://localhost:4000', { query: { token } });
-        // const newSocket = io('https://morpion-soket-back.vercel.app', { query: { token } });
+        console.log(newSocket)
         setSocket(newSocket);
 
         newSocket.on('connect', () => {

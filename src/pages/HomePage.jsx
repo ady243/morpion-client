@@ -14,15 +14,15 @@ export default function Home() {
     return (
         <>
             <NavBar />
-            <div>
+            <div className="text-center">
                 {currentUser ? <h1>Bonjour, {currentUser.fullName}</h1> : <h1>Veuillez vous connecter</h1>}
             </div>
             <div className="flex items-center justify-center h-screen mr-60">
-                <Game/>
                 <Chat />
+                <Game/>
             </div>
             <div>
-   
+       
             </div>
         </>
     );

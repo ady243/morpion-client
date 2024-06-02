@@ -13,8 +13,11 @@
     "@nextui-org/react": "^2.3.6",
     "axios": "^1.7.2",
     "framer-motion": "^11.2.3",
+    "moment": "^2.30.1",
     "react": "^18.2.0",
+    "react-bootstrap-icons": "^1.11.4",
     "react-dom": "^18.2.0",
+    "react-input-emoji": "^5.9.0",
     "react-router-dom": "^6.23.0",
     "socket.io-client": "^4.7.5"
   },
