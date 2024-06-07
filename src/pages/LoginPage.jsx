@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import {AuthContext} from "../context/AuthContext.jsx";
 
 const LoginPage = () => {
-
+    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState(null);
-    const { login, updateLogin, loginUser } = useContext(AuthContext);
+    const { loginUser } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
@@ -44,10 +44,7 @@ const LoginPage = () => {
             placeholder: 'Email',
             required: true,
             value: email,
-            onChange: (e) => {
-                setEmail(e.target.value);
-                updateLogin('email', e.target.value);
-            },
+            onChange: (e) => setEmail(e.target.value),
             style: inputStyle
         },
         {
@@ -57,21 +54,18 @@ const LoginPage = () => {
             placeholder: 'Password',
             required: true,
             value: password,
-            onChange: (e) => {
-                setPassword(e.target.value);
-                updateLogin('password', e.target.value);
-            },
+            onChange: (e) => setPassword(e.target.value), 
             style: inputStyle
         },
         {
-            type: 'button',
-            label: 'Login',
+            type: 'button', 
+            label: 'Login', 
             onClick: async () => {
-                const result = await login();
-                if (result && result.success) {
+                try {
+                    await loginUser(email, password);
                     navigate('/');
-                } else {
-                    setError(result && result.error ? result.error : "Une erreur s'est produite.");
+                } catch (error) {
+                    setError(error);
                 }
             },
             style: buttonLogin

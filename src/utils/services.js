@@ -1,6 +1,8 @@
 
-export const apiAuhentication = "https://morpion-soket-back.vercel.app/api"
-
+export const apiAuhentication = "http://localhost:4000/api";
+// export const apiAuhentication = "https://morpion-soket-back.vercel.app/api";
+export const baseUrl = "http://localhost:4000/api"; 
+export const baseUrlSocket = "http://localhost:4000"; 
 
 export const postRequest = async (url, body) => {
     const response = await fetch(url, {
@@ -11,7 +13,6 @@ export const postRequest = async (url, body) => {
         body: JSON.stringify(body)
     });
 
-
     let data;
     if (response.ok) {
         data = response.status === 204 ? null : await response.json();
@@ -21,6 +22,23 @@ export const postRequest = async (url, body) => {
     }
 
     return data;
+};
+
+
+
+export const getRequest = async (url) => {
+    const response = await fetch(url);
+
+    const data = await response.json();
+
+    if (!response.ok) {
+     let message = data?.error?.message || 'Something went wrong';
+
+     if(data?.message){
+        message = data.message;
+     }
+     return {error: true, message}
+    }
+
+    return data;
 }
-
-
