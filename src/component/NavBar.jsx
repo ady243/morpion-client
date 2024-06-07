@@ -38,6 +38,10 @@ export default function NavBar() {
             </NavbarContent>
             <NavbarContent justify="end">
                 <NavbarItem>
+               
+                    <Link color="foreground" href="/profile">
+                        <Button auto>Mon profile</Button>
+                    </Link>
                 </NavbarItem>
             </NavbarContent>
             <NavbarContent justify="end">

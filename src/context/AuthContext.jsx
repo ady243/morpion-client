@@ -6,6 +6,7 @@ export const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [currentUser, setCurrentUser] = useState(null); 
+    const [isLoading, setIsLoading] = useState(true);
     const [token, setToken] = useState(null);
     const [register, setRegister] = useState({
         fullName: '',
@@ -18,6 +19,8 @@ export const AuthContextProvider = ({ children }) => {
         password: '',
     });
 
+    console.log(token);
+  
     useEffect(() => {
         const storeUser = localStorage.getItem('user');
         const storedToken = localStorage.getItem('token');
@@ -27,13 +30,12 @@ export const AuthContextProvider = ({ children }) => {
         if (storedToken) {
             setToken(storedToken)
         }
+        setIsLoading(false); 
     }, []);
 
     useEffect(() => {
         if (user) {
             localStorage.setItem('user', JSON.stringify(user));
-        } else {
-            localStorage.removeItem('token');
         }
         if (token) {
             localStorage.setItem('token', token);
@@ -41,6 +43,7 @@ export const AuthContextProvider = ({ children }) => {
             localStorage.removeItem('token');
         }
     }, [user, token]);
+
 
     const updateRegister = (key, value) => {
         setRegister({

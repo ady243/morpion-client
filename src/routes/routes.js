@@ -3,7 +3,7 @@ import LoginPage from "../pages/LoginPage.jsx";
 import RegisterPage from "../pages/RegisterPage.jsx";
 import HomePage from "../pages/HomePage.jsx";
 import EmailWaitPage from "../pages/EmailWaitPage.jsx";
-import {ProfilePage} from "../pages/ProfilePage.jsx";
+import ProfilePage from "../pages/ProfilePage.jsx";
 
 export const routes = [
 
@@ -28,7 +28,7 @@ export const routes = [
     {
         path: "/profile",
         component: ProfilePage,
-        protected: true,
+        protected: false,
    
     },
     {
