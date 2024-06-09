@@ -44,11 +44,11 @@ function ChatBox() {
         });
 
         newSocket.on('messageSent', (message) => {
-            console.log('Message sent: ', message);
+            setMessages((prevMessages) => [...prevMessages, message]);
         });
 
         newSocket.on('getNotification', (notification) => {
-            console.log(notification);
+            console.log('Notification:', notification);
         });
 
         return () => {

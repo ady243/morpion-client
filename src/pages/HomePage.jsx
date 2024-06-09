@@ -5,10 +5,9 @@ import Chat from "./ChatPage.jsx";
 import Game from "../component/Game.jsx";
 
 export default function Home() {
-    const { currentUser } = useContext(AuthContext);
+    const { currentUser, user } = useContext(AuthContext);
     const [isChatOpen, setChatOpen] = useState(false);
     const [hasUnreadMessage, setHasUnreadMessage] = useState(false); 
-
     useEffect(() => {
       if (isChatOpen) {
         document.body.style.overflow = 'hidden';

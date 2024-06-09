@@ -100,7 +100,7 @@ export const ChatContextProvider = ({ children }) => {
                         return setUserChatsError(response);
                     }
                     if (!response.chats) {
-                        console.log('response does not contain chats');
+                        return setUserChat([]);
                     }
                     setUserChat(response.chats);
                 } catch (error) {

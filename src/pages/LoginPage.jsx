@@ -75,7 +75,7 @@ const LoginPage = () => {
     return (
         <div className='text-center mt-28'>
             <h1 style={{fontSize: '2rem', color: '#444'}}>Connexion</h1>
-            {error && error.message && <p className="text-red-500 text-sm">{error.message}</p>}
+            {error && error.error && <p className="text-red-500 text-sm">{error.message}</p>}
             <div className="bg-white rounded px-8 pt-6 pb-8 mb-4 max-w-lg mx-auto">
                 <FormBuilder fields={fields} />
                 <p className="text-sm text-gray-600 mt-4">
