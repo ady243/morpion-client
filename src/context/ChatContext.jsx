@@ -22,7 +22,7 @@ export const ChatContextProvider = ({ children }) => {
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        const newSocket = io("http://localhost:4000");
+        const newSocket = io("https://morpion-soket-back.onrender.com");
         setSocket(newSocket);
 
         return () => {
@@ -203,7 +203,8 @@ export const ChatContextProvider = ({ children }) => {
                 isMessagesLoading,
                 messagesError,
                 sendTextMessage,
-                onlineUsers
+                onlineUsers,
+                setOnlineUsers,
             }}
         >
             {children}

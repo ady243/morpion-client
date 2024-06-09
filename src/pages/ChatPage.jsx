@@ -7,6 +7,9 @@ import ChatBox from "../component/chat/ChatBox";
 
 
 function createUniqueUserChat(userChat) {
+    if (!userChat) {
+        return [];
+    }
     return Object.values(userChat.reduce((uniqueChats, chat) => {
         const chatId = chat._id;
         if (!uniqueChats[chatId]) {
@@ -15,13 +18,13 @@ function createUniqueUserChat(userChat) {
         return uniqueChats;
     }, {}));
 }
-
 function Chat({ setChatOpen }) {
     const { user } = useContext(AuthContext);
     const { userChat, isUserChatLoading, updateCurrentChat, currentChat } = useContext(ChatContext);
     const uniqueUserChat = useMemo(() => createUniqueUserChat(userChat), [userChat]);
- 
-
+    const [hasUnreadMessage, setHasUnreadMessage] = useState(false); 
+    const [socket, setSocket] = useState(null);
+  
     useEffect(() => {
        const currentChatId = currentChat?._id;
         if (currentChatId) {
@@ -32,10 +35,28 @@ function Chat({ setChatOpen }) {
         }
     }, [currentChat]);
 
+    useEffect(() => {
+        if (socket === null || currentChat === null) return;
+
+        const messageListener = (res) => {
+            if (!currentChat || currentChat._id !== res.chatId) {
+                setHasUnreadMessage(true); 
+                return;
+            }
+
+            setMessages((prev) => [...prev, res]);
+        };
+
+        socket.on("getMessage", messageListener);
+
+        return () => {
+            socket.off("getMessage", messageListener);
+        };
+    }, [socket, currentChat]);
+
     if (!userChat) return null;
 
     const handleChatSelect = (chat) => {
-        console.log('Selected chat:', chat);
         updateCurrentChat(chat);
     };
 

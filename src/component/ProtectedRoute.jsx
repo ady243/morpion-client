@@ -3,15 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 function ProtectedRoute({ children }) {
-    const { token } = useContext(AuthContext);
+    const { token, isLoading } = useContext(AuthContext);
     const isAuthenticated = !!token;
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!isAuthenticated) {
+        if (!isLoading && !isAuthenticated) {
             navigate('/login');
         }
-    }, [isAuthenticated, navigate]);
+    }, [isAuthenticated, isLoading, navigate]);
+
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return isAuthenticated ? children : null;
 }

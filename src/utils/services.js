@@ -1,8 +1,7 @@
 
-export const apiAuhentication = "http://localhost:4000/api";
-// export const apiAuhentication = "https://morpion-soket-back.vercel.app/api";
-export const baseUrl = "http://localhost:4000/api"; 
-export const baseUrlSocket = "http://localhost:4000"; 
+export const apiAuhentication = "https://morpion-soket-back.onrender.com/api";
+export const baseUrl = "https://morpion-soket-back.onrender.com/api"; 
+export const baseUrlSocket = "https://morpion-soket-back.onrender.com"; 
 
 export const postRequest = async (url, body) => {
     const response = await fetch(url, {

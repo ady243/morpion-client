@@ -28,7 +28,7 @@ export const routes = [
     {
         path: "/profile",
         component: ProfilePage,
-        protected: false,
+        protected: true,
    
     },
     {

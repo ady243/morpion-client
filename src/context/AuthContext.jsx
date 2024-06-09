@@ -7,7 +7,6 @@ export const AuthContextProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [currentUser, setCurrentUser] = useState(null); 
     const [isLoading, setIsLoading] = useState(true);
-    const [token, setToken] = useState(null);
     const [register, setRegister] = useState({
         fullName: '',
         email: '',
@@ -18,17 +17,15 @@ export const AuthContextProvider = ({ children }) => {
         email: '',
         password: '',
     });
-
-    console.log(token);
+    const getToken = () => {
+        const storedToken = localStorage.getItem('token');
+        return storedToken ? storedToken : null;
+    };
   
     useEffect(() => {
         const storeUser = localStorage.getItem('user');
-        const storedToken = localStorage.getItem('token');
         if (storeUser) {
             setUser(JSON.parse(storeUser));
-        }
-        if (storedToken) {
-            setToken(storedToken)
         }
         setIsLoading(false); 
     }, []);
@@ -37,12 +34,12 @@ export const AuthContextProvider = ({ children }) => {
         if (user) {
             localStorage.setItem('user', JSON.stringify(user));
         }
-        if (token) {
-            localStorage.setItem('token', token);
+        if (getToken()) {
+            localStorage.setItem('token', getToken());
         } else {
             localStorage.removeItem('token');
         }
-    }, [user, token]);
+    }, [user]);
 
 
     const updateRegister = (key, value) => {
@@ -90,9 +87,9 @@ export const AuthContextProvider = ({ children }) => {
             if (!response.ok) {
                 throw data;
             }
-            setToken(data.token); 
-            setCurrentUser(data.user); 
-            
+            localStorage.setItem('token', data.token); 
+            setCurrentUser(data.user);
+            setUser(data.user); 
         } catch (error) {
             console.error(error);
             throw error;
@@ -100,17 +97,17 @@ export const AuthContextProvider = ({ children }) => {
     };
 
     const logout = () => {
-        setUser(null);
-        setToken(null);
         localStorage.removeItem('user');
         localStorage.removeItem('token');
-    }
+
+        setUser(null);
+    };
 
     return (
         <AuthContext.Provider value={{
             user: currentUser,
             currentUser,
-            token,
+            token: getToken(), 
             logout,
             register: registerUser,
             loginUser,

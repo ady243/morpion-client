@@ -1,6 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { AuthContext } from "../context/AuthContext.jsx";
+import { ChatContext } from '../context/ChatContext.jsx';
+import { Button } from '@nextui-org/react';
+import { baseUrl } from '../utils/services.js';
+
 import "./game.css";
 
 const Game = () => {
@@ -11,16 +15,17 @@ const Game = () => {
     const [currentPlayer, setCurrentPlayer] = useState('X');
     const [players, setPlayers] = useState({ X: null, O: null });
     const [role, setRole] = useState(null);
+    const [room, setRoom] = useState(null);
+    const { onlineUsers, setOnlineUsers } = useContext(ChatContext);
+    
 
     useEffect(() => {
-        const newSocket = io('http://localhost:4000', { query: { token } });
-        console.log(newSocket)
+        const newSocket = io('https://morpion-soket-back.onrender.com', { query: { token } });
         setSocket(newSocket);
-
+    
         newSocket.on('connect', () => {
-            console.log('Connected:', newSocket.id);
+            console.log('Connected to server');
         });
-
         newSocket.on('role', (assignedRole) => {
             setRole(assignedRole);
         });
@@ -29,14 +34,41 @@ const Game = () => {
             setPlayers(playersData);
         });
 
-        newSocket.on('move', (moveData) => {
-            setHistory(moveData.history);
-            setCurrentMove(moveData.currentMove);
-            setCurrentPlayer(moveData.currentPlayer);
+        newSocket.on('onlineUsers', (users) => {
+            setOnlineUsers(users);
+        });
+
+        newSocket.on('joinedRoom', (room) => {
+            setRoom(room);
         });
 
         return () => newSocket.close();
     }, [token]);
+
+    const recordWin = async () => {
+        try {
+            const response = await fetch(`${baseUrl}/users/win`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to record win');
+            }
+    
+            const data = await response.json();
+            console.log('Wins recorded:', data.wins);
+        } catch (error) {
+            console.error('Error recording win:', error.message);
+        }
+    };
+
+    const joinRoom = (roomName) => {
+        socket.emit('joinRoom', roomName);
+    };
 
     const calculateWinner = (squares) => {
         const lines = [
@@ -63,16 +95,16 @@ const Game = () => {
         if (calculateWinner(currentSquares) || currentSquares[i]) return;
 
         if ((currentPlayer === 'X' && role !== 'X') || (currentPlayer === 'O' && role !== 'O')) return;
-
+    
         const nextSquares = currentSquares.slice();
         nextSquares[i] = currentPlayer;
         const nextHistory = history.slice(0, currentMove + 1).concat([nextSquares]);
-
+    
         setHistory(nextHistory);
         setCurrentMove(nextHistory.length - 1);
         const nextPlayer = currentPlayer === 'X' ? 'O' : 'X';
         setCurrentPlayer(nextPlayer);
-
+    
         if (socket) {
             socket.emit('move', {
                 history: nextHistory,
@@ -82,23 +114,6 @@ const Game = () => {
         }
     };
 
-    const currentSquares = history[currentMove];
-    const winner = calculateWinner(currentSquares);
-    const xIsNext = currentMove % 2 === 0;
-
-    let status;
-    if (winner) {
-        if (players[winner]?.id === socket.id) {
-            status = `Félicitations ${players[winner].name}, vous avez gagné!`;
-        } else {
-            status = `Désolé, vous avez perdu. ${players[winner].name} a gagné.`;
-        }
-        socket.emit('win', { winner: players[winner]?.id });
-    } else {
-        const nextPlayerName = xIsNext ? (role === 'X' ? (players.X?.name || 'Votre adversaire') : (players.O?.name || 'Votre adversaire')) : (role === 'O' ? (players.O?.name || 'Votre adversaire') : (players.X?.name || 'Votre adversaire'));
-        status = `Au tour de ${nextPlayerName}`;
-    }
-
     const Square = ({ value, onClick }) => (
         <button className="button" onClick={onClick}>
             <span className={`${value === 'X' ? 'text-red-500' : 'text-blue-500'}`}>{value}</span>
@@ -107,13 +122,13 @@ const Game = () => {
 
     const Board = () => (
         <>
-            <div className="mb-4 font-bold">{status}</div>
+            <div className="mb-4 font-bold">{room ? `Salon: ${room}` : 'En attente de salon'}</div>
             {[0, 1, 2].map((row) => (
                 <div className="flex" key={row} style={{ justifyContent: 'center' }}>
                     {[0, 1, 2].map((col) => (
                         <Square
                             key={col}
-                            value={currentSquares[row * 3 + col]}
+                            value={history[currentMove][row * 3 + col]}
                             onClick={() => handlePlay(row * 3 + col)}
                         />
                     ))}
@@ -124,6 +139,21 @@ const Game = () => {
 
     return (
         <div className="container">
+            <div>
+                <h2>Utilisateurs en ligne :</h2>
+                <ul>
+                    {onlineUsers && onlineUsers.map((user, index) => (
+                        <li key={user.id || index}>
+                            {user.fullName} 
+                            <Button 
+                                onClick={() => joinRoom(user.room)}
+                                className="additional-classes-for-game-button">
+                                Rejoindre le salon
+                            </Button>
+                        </li>
+                    ))}
+                </ul>
+            </div>
             <div className="w-full max-w-md p-4 mx-auto">
                 <div className="bg-white p-4 rounded-lg shadow-lg">
                     <Board />
