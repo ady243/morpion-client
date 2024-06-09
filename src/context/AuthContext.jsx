@@ -6,7 +6,6 @@ export const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [currentUser, setCurrentUser] = useState(null); 
-    const [isLoading, setIsLoading] = useState(true);
     const [token, setToken] = useState(null);
     const [register, setRegister] = useState({
         fullName: '',
@@ -19,8 +18,6 @@ export const AuthContextProvider = ({ children }) => {
         password: '',
     });
 
-    console.log(token);
-  
     useEffect(() => {
         const storeUser = localStorage.getItem('user');
         const storedToken = localStorage.getItem('token');
@@ -30,12 +27,13 @@ export const AuthContextProvider = ({ children }) => {
         if (storedToken) {
             setToken(storedToken)
         }
-        setIsLoading(false); 
     }, []);
 
     useEffect(() => {
         if (user) {
             localStorage.setItem('user', JSON.stringify(user));
+        } else {
+            localStorage.removeItem('user');
         }
         if (token) {
             localStorage.setItem('token', token);
@@ -43,7 +41,6 @@ export const AuthContextProvider = ({ children }) => {
             localStorage.removeItem('token');
         }
     }, [user, token]);
-
 
     const updateRegister = (key, value) => {
         setRegister({
@@ -64,8 +61,6 @@ export const AuthContextProvider = ({ children }) => {
             }
 
             const data = await response.json();
-            console.log(data);
-            console.log(data.user);
             setUser(data.user);
         } catch (error) {
             console.error(error);
@@ -92,10 +87,14 @@ export const AuthContextProvider = ({ children }) => {
             }
             setToken(data.token); 
             setCurrentUser(data.user); 
-            
+            return null; 
         } catch (error) {
             console.error(error);
-            throw error;
+            if (error.name === 'TypeError') {
+       
+                return { error: { message: 'Network error, please try again later.' } };
+            }
+            return { error };
         }
     };
 
@@ -108,7 +107,7 @@ export const AuthContextProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={{
-            user: currentUser,
+            user,
             currentUser,
             token,
             logout,

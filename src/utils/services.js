@@ -1,5 +1,6 @@
 
-export const apiAuhentication = "https://morpion-soket-back.onrender.com/api";
+
+export const apiAuhentication = "http://localhost:4000/api";
 export const baseUrl = "https://morpion-soket-back.onrender.com/api"; 
 export const baseUrlSocket = "https://morpion-soket-back.onrender.com"; 
 
@@ -22,8 +23,6 @@ export const postRequest = async (url, body) => {
 
     return data;
 };
-
-
 
 export const getRequest = async (url) => {
     const response = await fetch(url);
