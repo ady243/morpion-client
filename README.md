@@ -12,3 +12,15 @@
 # pour l'email il y'a eu un bloquage de brevo ce qui fait qu'il faut attendre qu'il debloque le compte mais en soit l'email s'envoit tres bien 
 
 
+# Au cas oùvous ne recevez pas des mail, j'ai créer deux usr expres 
+
+`
+email : user@test.com
+password:  User123&
+ `
+
+
+`
+email : admin@test.com
+password:  User123&
+ `

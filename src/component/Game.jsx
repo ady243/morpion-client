@@ -60,7 +60,7 @@ const Game = () => {
             }
     
             const data = await response.json();
-            console.log('Wins recorded:', data.wins);
+           
         } catch (error) {
             console.error('Error recording win:', error.message);
         }

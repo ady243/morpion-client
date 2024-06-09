@@ -63,8 +63,7 @@ export const AuthContextProvider = ({ children }) => {
             }
 
             const data = await response.json();
-            console.log(data);
-            console.log(data.user);
+        
             setUser(data.user);
         } catch (error) {
             console.error(error);
