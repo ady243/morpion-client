@@ -1,8 +1,14 @@
-# React + Vite
+# Comment fonctionne l'app ? 
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+`pour avoir le chat il faut forcement cliquer sur le potentiel chat pour faire des mises à jour `
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# NB: il peut y avoir un probleme de bloquage sur le socket io (url) donc ce qui fait qu'il y'aura des bugs des temps en temps à cause de ça et l'hebergeur 
+
+# pour demarer le serveur la commande est 
+
+` npm run dev `
+
+# pour l'email il y'a eu un bloquage de brevo ce qui fait qu'il faut attendre qu'il debloque le compte mais en soit l'email s'envoit tres bien 
+
+

@@ -4,33 +4,30 @@ import './App.css';
 import routes from './routes/routes.js';
 import React from "react";
 import ProtectedRoute from './component/ProtectedRoute.jsx';
-import { AuthContextProvider } from './context/AuthContext'; 
-import { ChatContextProvider } from './context/ChatContext.jsx';
+import { ChatContextProvider } from './context/ChatContext'; 
 
 function App() {
     return (
         <NextUIProvider>
-            <AuthContextProvider>
-                <ChatContextProvider>
-                    <Router>
-                        <Routes>
+            <ChatContextProvider>
+                <Router>
+                    <Routes>
                         {routes.map((route, index) => {
-                        return (
-                            <Route
-                                key={index}
-                                path={route.path}
-                                element={
-                                    route.protected ? 
-                                    <ProtectedRoute>{React.createElement(route.component)}</ProtectedRoute> :
-                                    React.createElement(route.component)
-                                }
-                            />
-                        );
-                    })}
-                        </Routes>
-                    </Router>
-                </ChatContextProvider>
-            </AuthContextProvider>
+                            return (
+                                <Route
+                                    key={index}
+                                    path={route.path}
+                                    element={
+                                        route.protected ? 
+                                        <ProtectedRoute>{React.createElement(route.component)}</ProtectedRoute> :
+                                        React.createElement(route.component)
+                                    }
+                                />
+                            );
+                        })}
+                    </Routes>
+                </Router>
+            </ChatContextProvider>
         </NextUIProvider>
     );
 }

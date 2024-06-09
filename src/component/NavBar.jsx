@@ -7,7 +7,7 @@ import { Link as RouterLink } from 'react-router-dom';
 
 export default function NavBar() {
     const [isInvisible] = useState(false);
-    const { logout } = useContext(AuthContext);
+    const { logout, token } = useContext(AuthContext);
     const [notification, setNotification] = useState(0);
 
     const StyleNotification = {
@@ -29,31 +29,27 @@ export default function NavBar() {
     };
 
     return (
-        <Navbar shouldHideOnScroll>
-            <NavbarBrand>
-                <p className="font-bold text-inherit" style={StyleLogo}>Morpion<span className="text-red-800">Game</span></p>
-            </NavbarBrand>
-            <NavbarContent className="hidden sm:flex gap-4" justify="center">
-                <NavbarItem style={StyleNotification}>
+        <nav className="font-sans flex flex-col text-center sm:flex-row sm:text-left sm:justify-between py-4 px-6 bg-white shadow sm:items-baseline w-full">
+            <div className="mb-2 sm:mb-0">
+                <a href="#" className="text-2xl no-underline text-grey-darkest hover:text-blue-dark"></a>
+            </div>
+            <div>
+                <div style={StyleNotification}>
                     <Link color="foreground" href="#">
                         <Badge color="danger" content={notification} isInvisible={isInvisible} shape="circle">
                             <NotificationIcon className="fill-current" size={30} />
                         </Badge>
                     </Link>
-                </NavbarItem>
-            </NavbarContent>
-            <NavbarContent justify="end">
-            <NavbarItem>
-                <RouterLink to="/profile">
-                    <Button auto>Mon profile</Button>
-                </RouterLink>
-            </NavbarItem>
-            </NavbarContent>
-            <NavbarContent justify="end">
-                <NavbarItem>
-                    <Button auto onClick={logout}>Déconnexion</Button>
-                </NavbarItem>
-            </NavbarContent>
-        </Navbar>
+                </div>
+                {token ? (
+                    <>
+                        <RouterLink to="/profile" className="text-lg no-underline text-grey-darkest hover:text-blue-dark ml-2">Profile</RouterLink>
+                        <Button onClick={logout} className="ml-2">se deconnecter</Button>
+                    </>
+                ) : (
+                    <RouterLink to="/login" className="text-lg no-underline text-grey-darkest hover:text-blue-dark ml-2">se connecter</RouterLink>
+                )}
+            </div>
+        </nav>
     );
 }
